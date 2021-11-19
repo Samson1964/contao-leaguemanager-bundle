@@ -1,0 +1,6 @@
+Ergebnisdienst auf Contao-Basis
+===============================
+
+- Spielerstammdaten kommen aus einer zentralen Spielertabelle (tl_dwz_spi)
+- Aktuelle Daten des Spielers werden innerhalb der Staffel gespeichert
+  (DWZ, Elo)

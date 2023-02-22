@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['leaguemanager_ligen'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_user']['leaguemanager_ligen'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'options_callback'        => array('\Samson\Ergebnisdienst\Funktionen', 'getLigenliste'),
+	'options_callback'        => array('\Schachbulle\ContaoLeaguemanagerBundle\Classes\Funktionen', 'getLigenliste'),
 	'eval'                    => array('multiple'=>true),
 	'sql'                     => "blob NULL"
 );

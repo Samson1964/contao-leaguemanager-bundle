@@ -60,7 +60,7 @@ class Funktionen extends \Backend
 	{
 		if (self::$instance === null)
 		{
-			self::$instance = new \Samson\Ergebnisdienst\Funktionen();
+			self::$instance = new \Schachbulle\ContaoLeaguemanagerBundle\Classes\Funktionen();
 		}
 	
 		return self::$instance;

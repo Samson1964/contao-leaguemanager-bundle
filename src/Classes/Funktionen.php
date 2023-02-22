@@ -71,9 +71,9 @@ class Funktionen extends \Backend
 		$array = array();
 		$saison = array();
 		// Saisons und Staffeln einlesen
-		$objLigen = \Database::getInstance()->prepare("SELECT * FROM tl_ergebnisdienst_staffeln ORDER BY title ASC")
+		$objLigen = \Database::getInstance()->prepare("SELECT * FROM tl_leaguemanager_staffeln ORDER BY title ASC")
 		                           ->execute();
-		$objSaisons = \Database::getInstance()->prepare("SELECT * FROM tl_ergebnisdienst ORDER BY toYear DESC, fromYear DESC")
+		$objSaisons = \Database::getInstance()->prepare("SELECT * FROM tl_leaguemanager ORDER BY toYear DESC, fromYear DESC")
 		                             ->execute();
 		while($objSaisons->next())
 		{

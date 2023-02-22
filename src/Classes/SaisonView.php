@@ -77,7 +77,7 @@ class SaisonView extends \Module
 		$this->Template = new \FrontendTemplate('ergebnisdienst_view');
 
 		// Saisondaten laden
-		$objSaison = $this->Database->prepare("SELECT * FROM tl_ergebnisdienst WHERE id=?")
+		$objSaison = $this->Database->prepare("SELECT * FROM tl_leaguemanager WHERE id=?")
 									->execute($this->ergebnisdienst_saison);
 		$param = '/season/' . $this->ergebnisdienst_saison;
 		$this->Template->Saison = $this->ergebnisdienst_saison;
@@ -86,7 +86,7 @@ class SaisonView extends \Module
 		// Staffeldaten laden, wenn vorhanden
 		if($this->ergebnisdienst_staffel)
 		{
-			$objStaffel = $this->Database->prepare("SELECT * FROM tl_ergebnisdienst_staffeln WHERE id=?")
+			$objStaffel = $this->Database->prepare("SELECT * FROM tl_leaguemanager_staffeln WHERE id=?")
 										 ->execute($this->ergebnisdienst_staffel);
 			$param .= '/relay/' . $this->ergebnisdienst_staffel;
 			$this->Template->Staffel = $this->ergebnisdienst_staffel;
@@ -97,7 +97,7 @@ class SaisonView extends \Module
 			$TeamID = array();
 			$Mannschaft = array();
 			$Kreuztabelle = array();
-			$objTeams = $this->Database->prepare("SELECT * FROM tl_ergebnisdienst_mannschaften WHERE pid=? ORDER BY sorting ASC")
+			$objTeams = $this->Database->prepare("SELECT * FROM tl_leaguemanager_mannschaften WHERE pid=? ORDER BY sorting ASC")
 											  ->execute($this->ergebnisdienst_staffel);
 			while($objTeams->next())
 			{
@@ -131,7 +131,7 @@ class SaisonView extends \Module
 			}
 			
 			// Paarungen laden und Einzelergebnisse auswerten
-			$objPairs = $this->Database->prepare("SELECT * FROM tl_ergebnisdienst_paarungen WHERE pid=?")
+			$objPairs = $this->Database->prepare("SELECT * FROM tl_leaguemanager_paarungen WHERE pid=?")
 									   ->execute($this->ergebnisdienst_staffel);
 			while($objPairs->next())
 			{

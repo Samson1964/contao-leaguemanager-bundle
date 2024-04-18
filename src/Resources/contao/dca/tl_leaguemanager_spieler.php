@@ -83,9 +83,17 @@ $GLOBALS['TL_DCA']['tl_leaguemanager_spieler'] = array
 			),
 			'toggle' => array
 			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_leaguemanager_spieler']['toggle'],
-				'icon'                => 'visible.gif',
-				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+				'label'                => &$GLOBALS['TL_LANG']['tl_leaguemanager_spieler']['toggle'],
+				'attributes'           => 'onclick="Backend.getScrollOffset()"',
+				'haste_ajax_operation' => array
+				(
+					'field'            => 'published',
+					'options'          => array
+					(
+						array('value' => '', 'icon' => 'invisible.svg'),
+						array('value' => '1', 'icon' => 'visible.svg'),
+					),
+				),
 			),
 			'show' => array
 			(
@@ -292,7 +300,7 @@ $GLOBALS['TL_DCA']['tl_leaguemanager_spieler'] = array
 			'eval'                    => array('filesOnly'=>true, 'fieldType'=>'radio', 'tl_class'=>'clr'),
 			'sql'                     => "binary(16) NULL",
 		), 
-		// Spieler veröffentlicht
+		// Spieler verÃ¶ffentlicht
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_leaguemanager_spieler']['published'],
@@ -363,7 +371,7 @@ class tl_leaguemanager_spieler extends Backend
 	}
 
 	/**
-	 * Zahl für Datenbank umwandeln
+	 * Zahl fÃ¼r Datenbank umwandeln
 	 * @param mixed
 	 * @return mixed
 	 */
@@ -400,7 +408,7 @@ class tl_leaguemanager_spieler extends Backend
 	}
 
 	/**
-	 * Datumswert für Datenbank umwandeln
+	 * Datumswert fÃ¼r Datenbank umwandeln
 	 * @param mixed
 	 * @return mixed
 	 */

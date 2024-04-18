@@ -100,10 +100,17 @@ $GLOBALS['TL_DCA']['tl_leaguemanager_staffeln'] = array
 			),
 			'toggle' => array
 			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_leaguemanager_staffeln']['toggle'],
-				'icon'                => 'visible.gif',
-				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-				'button_callback'     => array('tl_leaguemanager_staffeln', 'toggleIcon')
+				'label'                => &$GLOBALS['TL_LANG']['tl_leaguemanager_staffeln']['toggle'],
+				'attributes'           => 'onclick="Backend.getScrollOffset()"',
+				'haste_ajax_operation' => array
+				(
+					'field'            => 'published',
+					'options'          => array
+					(
+						array('value' => '', 'icon' => 'invisible.svg'),
+						array('value' => '1', 'icon' => 'visible.svg'),
+					),
+				),
 			),
 			'show' => array
 			(
@@ -283,7 +290,7 @@ $GLOBALS['TL_DCA']['tl_leaguemanager_staffeln'] = array
 			),
 			'sql'                     => "char(5) NOT NULL default ''"
 		), 
-		// Staffel veröffentlicht
+		// Staffel verÃ¶ffentlicht
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_leaguemanager_staffeln']['published'],
@@ -324,7 +331,7 @@ class tl_leaguemanager_staffeln extends Backend
 	}
 
 	/**
-	 * Berechtigungen zum Bearbeiten der Tabelle tl_leaguemanager prüfen
+	 * Berechtigungen zum Bearbeiten der Tabelle tl_leaguemanager prÃ¼fen
 	 */
 	public function checkPermission()
 	{
@@ -344,22 +351,22 @@ class tl_leaguemanager_staffeln extends Backend
 
 		if(!$this->User->hasAccess('create', 'leaguemanager_ligenrechte'))
 		{
-			// Hinzufügen-Button entfernen
+			// HinzufÃ¼gen-Button entfernen
 			$GLOBALS['TL_DCA']['tl_leaguemanager_staffeln']['config']['closed'] = true;
 		}
 
-		// Alle nicht zugewiesenen Datensätze entfernen
+		// Alle nicht zugewiesenen DatensÃ¤tze entfernen
 		if(!is_array($this->User->leaguemanager_ligen) || empty($this->User->leaguemanager_ligen))
 		{
-			$root = array(0); // Erlaubte Datensätze: keine
+			$root = array(0); // Erlaubte DatensÃ¤tze: keine
 		}
 		else
 		{
-			$root = $this->User->leaguemanager_ligen; // Erlaubte Ligen-ID's übernehmen
+			$root = $this->User->leaguemanager_ligen; // Erlaubte Ligen-ID's Ã¼bernehmen
 		}
 		$GLOBALS['TL_DCA']['tl_leaguemanager_staffeln']['list']['sorting']['root'] = $root;
 
-		// Aktuelle Aktion prüfen
+		// Aktuelle Aktion prÃ¼fen
 		switch (Input::get('act'))
 		{
 			case 'create': // Datensatz anlegen
@@ -399,7 +406,7 @@ class tl_leaguemanager_staffeln extends Backend
 				break; 
 
 			case 'editAll': // Mehrere bearbeiten
-			case 'deleteAll': // Mehrere löschen
+			case 'deleteAll': // Mehrere lÃ¶schen
 			case 'overrideAll':
 				$session = $this->Session->getData();
 				if (Input::get('act') == 'deleteAll' && !$this->User->hasAccess('delete', 'leaguemanager_saisons'))
@@ -437,10 +444,10 @@ class tl_leaguemanager_staffeln extends Backend
 	 */
 	public function generateEditheaderButton($row, $href, $label, $title, $icon, $attributes)
 	{
-		// Rechteprüfung für Bearbeitung der Saison-Einstellung
+		// RechteprÃ¼fung fÃ¼r Bearbeitung der Saison-Einstellung
 		// 1) Admin?
 		// 2) Benutzer/Benutzergruppe: Irgendein Feld in tl_leaguemanager erlaubt? 
- 		// Prüfung $this->User->hasAccess('editheader', 'leaguemanager_saisonrechte') wegen 2) unnötig
+ 		// PrÃ¼fung $this->User->hasAccess('editheader', 'leaguemanager_saisonrechte') wegen 2) unnÃ¶tig
  		return ($this->User->isAdmin || count(preg_grep('/^tl_leaguemanager_staffeln::/', $this->User->alexf)) > 0) ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.gif$/i', '_.gif', $icon)).' ';
 	}
 
@@ -507,74 +514,6 @@ class tl_leaguemanager_staffeln extends Backend
 	}
 
 	/**
-	 * Return the "toggle visibility" button
-	 * @param array
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @return string
-	 */
-	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-	{
-		$this->import('BackendUser', 'User');
-		
-		if (strlen($this->Input->get('tid')))
-		{
-			$this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 0));
-			$this->redirect($this->getReferer());
-		}
-		
-		// Check permissions AFTER checking the tid, so hacking attempts are logged
-		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_leaguemanager_staffeln::published', 'alexf'))
-		{
-			return '';
-		}
-		
-		$href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.$row[''];
-		
-		if (!$row['published'])
-		{
-			$icon = 'invisible.gif';
-		}
-		
-		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
-	}
-
-	/**
-	 * Disable/enable a user group
-	 * @param integer
-	 * @param boolean
-	 */
-	public function toggleVisibility($intId, $blnPublished)
-	{
-		// Check permissions to publish
-		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_leaguemanager_staffeln::published', 'alexf'))
-		{
-			$this->log('Not enough permissions to show/hide record ID "'.$intId.'"', 'tl_leaguemanager_staffeln toggleVisibility', TL_ERROR);
-			$this->redirect('contao/main.php?act=error');
-		}
-
-		$this->createInitialVersion('tl_leaguemanager_staffeln', $intId);
-
-		// Trigger the save_callback
-		if (is_array($GLOBALS['TL_DCA']['tl_leaguemanager_staffeln']['fields']['published']['save_callback']))
-		{
-			foreach ($GLOBALS['TL_DCA']['tl_leaguemanager_staffeln']['fields']['published']['save_callback'] as $callback)
-			{
-				$this->import($callback[0]);
-				$blnPublished = $this->$callback[0]->$callback[1]($blnPublished, $this);
-			}
-		}
-
-		// Update the database
-		$this->Database->prepare("UPDATE tl_leaguemanager_staffeln SET tstamp=". time() .", published='" . ($blnPublished ? '' : '1') . "' WHERE id=?")
-			->execute($intId);
-		$this->createNewVersion('tl_leaguemanager_staffeln', $intId);
-	}
-
-	/**
 	 * Return the link picker wizard
 	 * @param \DataContainer
 	 * @return string
@@ -602,7 +541,7 @@ class tl_leaguemanager_staffeln extends Backend
 	}
 
 	/**
-	 * Zahl für Datenbank umwandeln
+	 * Zahl fÃ¼r Datenbank umwandeln
 	 * @param mixed
 	 * @return mixed
 	 */

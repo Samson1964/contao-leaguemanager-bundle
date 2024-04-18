@@ -88,9 +88,17 @@ $GLOBALS['TL_DCA']['tl_leaguemanager_paarungen'] = array
 			),
 			'toggle' => array
 			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_leaguemanager_paarungen']['toggle'],
-				'icon'                => 'visible.gif',
-				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+				'label'                => &$GLOBALS['TL_LANG']['tl_leaguemanager_paarungen']['toggle'],
+				'attributes'           => 'onclick="Backend.getScrollOffset()"',
+				'haste_ajax_operation' => array
+				(
+					'field'            => 'published',
+					'options'          => array
+					(
+						array('value' => '', 'icon' => 'invisible.svg'),
+						array('value' => '1', 'icon' => 'visible.svg'),
+					),
+				),
 			),
 			'show' => array
 			(
@@ -490,8 +498,8 @@ class tl_leaguemanager_paarungen extends Backend
 		// Anzahl Stammbretter laden und Variablen setzen
 		$stammbretter = 8;
 		$objBretter = $this->Database->prepare("SELECT boards FROM tl_leaguemanager_staffeln WHERE id=?")
-						   ->limit(1)
-						   ->execute($dc->activeRecord->pid);
+		                   ->limit(1)
+		                   ->execute($dc->activeRecord->pid);
 		if($objBretter->boards) $bretter = $objBretter->boards; 
 		else $bretter = $stammbretter;
 		$GLOBALS['TL_DCA']['tl_leaguemanager_paarungen']['fields']['boardresults']['eval']['minCount'] = $bretter;
@@ -500,7 +508,7 @@ class tl_leaguemanager_paarungen extends Backend
 		// Mannschaften laden
 		$arrForms = array();
 		$objForms = $this->Database->prepare("SELECT id, title FROM tl_leaguemanager_mannschaften WHERE pid=? ORDER BY sorting ASC")
-						 ->execute($dc->activeRecord->pid);
+		                 ->execute($dc->activeRecord->pid);
 
 		while ($objForms->next())
 		{

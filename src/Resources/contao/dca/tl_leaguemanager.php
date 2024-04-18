@@ -95,10 +95,17 @@ $GLOBALS['TL_DCA']['tl_leaguemanager'] = array
 			),
 			'toggle' => array
 			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_leaguemanager']['toggle'],
-				'icon'                => 'visible.gif',
-				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-				'button_callback'     => array('tl_leaguemanager', 'toggleIcon')
+				'label'                => &$GLOBALS['TL_LANG']['tl_leaguemanager']['toggle'],
+				'attributes'           => 'onclick="Backend.getScrollOffset()"',
+				'haste_ajax_operation' => array
+				(
+					'field'            => 'published',
+					'options'          => array
+					(
+						array('value' => '', 'icon' => 'invisible.svg'),
+						array('value' => '1', 'icon' => 'visible.svg'),
+					),
+				),
 			),
 			'show' => array
 			(
@@ -389,74 +396,6 @@ class tl_leaguemanager extends Backend
 	public function generateShowButton($row, $href, $label, $title, $icon, $attributes)
 	{
 		return ($this->User->isAdmin || $this->User->hasAccess('show', 'leaguemanager_saisonrechte')) ? '<a onclick="Backend.openModalIframe({\'width\':768,\'title\':\'Details anzeigen\',\'url\':this.href});return false" href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'&amp;popup=1" title="'.specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml('system/modules/leaguemanager/assets/images/show_.gif').' ';
-	}
-
-	/**
-	 * Return the "toggle visibility" button
-	 * @param array
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @return string
-	 */
-	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-	{
-		$this->import('BackendUser', 'User');
-		
-		if (strlen($this->Input->get('tid')))
-		{
-			$this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state') == 0));
-			$this->redirect($this->getReferer());
-		}
-		
-		// Check permissions AFTER checking the tid, so hacking attempts are logged
-		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_leaguemanager::published', 'alexf'))
-		{
-			return '';
-		}
-		
-		$href .= '&amp;id='.$this->Input->get('id').'&amp;tid='.$row['id'].'&amp;state='.$row[''];
-		
-		if (!$row['published'])
-		{
-			$icon = 'invisible.gif';
-		}
-		
-		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
-	}
-
-	/**
-	 * Disable/enable a user group
-	 * @param integer
-	 * @param boolean
-	 */
-	public function toggleVisibility($intId, $blnPublished)
-	{
-		// Check permissions to publish
-		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_leaguemanager::published', 'alexf'))
-		{
-			$this->log('Not enough permissions to show/hide record ID "'.$intId.'"', 'tl_leaguemanager toggleVisibility', TL_ERROR);
-			$this->redirect('contao/main.php?act=error');
-		}
-
-		$this->createInitialVersion('tl_leaguemanager', $intId);
-
-		// Trigger the save_callback
-		if (is_array($GLOBALS['TL_DCA']['tl_leaguemanager']['fields']['published']['save_callback']))
-		{
-			foreach ($GLOBALS['TL_DCA']['tl_leaguemanager']['fields']['published']['save_callback'] as $callback)
-			{
-				$this->import($callback[0]);
-				$blnPublished = $this->$callback[0]->$callback[1]($blnPublished, $this);
-			}
-		}
-
-		// Update the database
-		$this->Database->prepare("UPDATE tl_leaguemanager SET tstamp=". time() .", published='" . ($blnPublished ? '' : '1') . "' WHERE id=?")
-			->execute($intId);
-		$this->createNewVersion('tl_leaguemanager', $intId);
 	}
 
 	/**

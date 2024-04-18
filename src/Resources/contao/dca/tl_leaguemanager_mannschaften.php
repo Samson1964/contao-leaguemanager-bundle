@@ -110,9 +110,17 @@ $GLOBALS['TL_DCA']['tl_leaguemanager_mannschaften'] = array
 			),
 			'toggle' => array
 			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_leaguemanager_mannschaften']['toggle'],
-				'icon'                => 'visible.gif',
-				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+				'label'                => &$GLOBALS['TL_LANG']['tl_leaguemanager_mannschaften']['toggle'],
+				'attributes'           => 'onclick="Backend.getScrollOffset()"',
+				'haste_ajax_operation' => array
+				(
+					'field'            => 'published',
+					'options'          => array
+					(
+						array('value' => '', 'icon' => 'invisible.svg'),
+						array('value' => '1', 'icon' => 'visible.svg'),
+					),
+				),
 			),
 			'show' => array
 			(
@@ -225,7 +233,7 @@ $GLOBALS['TL_DCA']['tl_leaguemanager_mannschaften'] = array
 			'eval'                    => array('filesOnly'=>true, 'fieldType'=>'radio', 'tl_class'=>'clr'),
 			'sql'                     => "binary(16) NULL",
 		), 
-		// Mannschaft veröffentlicht
+		// Mannschaft verÃ¶ffentlicht
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_leaguemanager_mannschaften']['published'],
@@ -323,7 +331,7 @@ class tl_leaguemanager_mannschaften extends Backend
 		}
 
 		$objAlias = $this->Database->prepare("SELECT id FROM tl_leaguemanager_mannschaften WHERE alias=?")
-								   ->execute($varValue);
+		                           ->execute($varValue);
 
 		// Check whether the news alias exists
 		if ($objAlias->numRows > 1 && !$autoAlias)
@@ -352,7 +360,7 @@ class tl_leaguemanager_mannschaften extends Backend
 	}
 
 	/**
-	 * Zahl für Datenbank umwandeln
+	 * Zahl fÃ¼r Datenbank umwandeln
 	 * @param mixed
 	 * @return mixed
 	 */
